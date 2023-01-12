@@ -1,23 +1,48 @@
-import logo from './logo.svg';
+import axios from 'axios';
+import { useState, useEffect } from 'react';
 import './App.css';
 
+
 function App() {
+
+  const [data, setData] = useState([]);
+
+  useEffect(()=>{
+    axios.get("https://reactnd-books-api.udacity.com/books",
+    { headers: { 'Authorization': 'whatever-you-want' },
+  })
+    .then(res=>{
+      setData(res.data.books)
+    })
+    .catch(err=>{
+      console.log("Status Code: "+err.response.status)
+      if(err.response.status===404){
+        console.log("Website not found")
+      }
+      else{
+        console.log(err)
+      }
+    })
+  },[])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      {data.map((item)=>{
+        return(
+          <div key={item.id}>
+            <h4>{item.title}</h4>
+            <div className='flex'>
+              <img src={item.imageLinks.smallThumbnail} alt=""></img>
+              <p>{item.description}</p>
+            </div>
+            {item.authors.map((author,index)=>{
+              return <span key={index}>{author}</span>
+            })}
+            <hr></hr>
+          </div>
+        )
+      })}
+
     </div>
   );
 }
